@@ -9,7 +9,7 @@ Execute this command, in the root of the repository, to install all dependencies
 
 ## How to run
 ```python
-python3 src/analysis.py
+bin/run
 ```
 Execute this command, in the root of the repository, to run the project
 
