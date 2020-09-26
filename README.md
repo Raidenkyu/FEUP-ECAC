@@ -9,7 +9,7 @@ Execute this command, in the root of the repository, to install all dependencies
 
 ## How to run
 ```python
-bin/run
+python3 src
 ```
 Execute this command, in the root of the repository, to run the project
 
