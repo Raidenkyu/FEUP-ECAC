@@ -1,17 +1,14 @@
-# Import packages
-import os
-
+"""Import Path"""
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import pandas as pd
 
-example_file = 'account.csv'
+EXAMPLE_FILE = 'account.csv'
 
 folder_path = Path("res/")
 
-file_path = str(folder_path / example_file)
+FILE_PATH = str(folder_path / EXAMPLE_FILE)
 
-dataset = pd.read_csv(file_path, sep=";")
+dataset = pd.read_csv(FILE_PATH, sep=";")
 
 print(dataset)
