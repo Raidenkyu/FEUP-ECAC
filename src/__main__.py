@@ -1,2 +1,1 @@
-"""Analysis module"""
 import analysis
