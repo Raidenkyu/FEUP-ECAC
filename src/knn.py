@@ -7,7 +7,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 
 
-def knn(train_dataset, test_dataset):
+def knn_model(train_dataset, test_dataset):
     X_test = test_dataset.iloc[:, 0:5].values
     y_test = test_dataset.iloc[:, 6].values
     X_train = train_dataset.iloc[:, 0:5].values
@@ -18,13 +18,6 @@ def knn(train_dataset, test_dataset):
 
     X_train = scaler.transform(X_train)
     X_test = scaler.transform(X_test)
-    classifier = KNeighborsClassifier(n_neighbors=5)
-    classifier.fit(X_train, y_train)
-
-    y_pred = classifier.predict(X_test)
-
-    print(str(confusion_matrix(y_test, y_pred)))
-    print(str(classification_report(y_test, y_pred)))
 
     error = []
 
@@ -33,12 +26,32 @@ def knn(train_dataset, test_dataset):
         knn = KNeighborsClassifier(n_neighbors=i)
         knn.fit(X_train, y_train)
         pred_i = knn.predict(X_test)
-        print("Predicted: {}     Real: {}".format(pred_i, y_test))
+        # print("Predicted: {}     Real: {}".format(pred_i, y_test))
         error.append(np.mean(pred_i != y_test))
 
-    plt.figure(figsize=(12, 6))
-    plt.plot(range(1, 40), error, color='red', linestyle='dashed', marker='o',
-             markerfacecolor='blue', markersize=10)
-    plt.title('Error Rate K Value')
-    plt.xlabel('K Value')
-    plt.ylabel('Mean Error')
+    best_k = error.index(min(error))
+
+    knn = KNeighborsClassifier(n_neighbors=best_k)
+    knn.fit(X_train, y_train)
+
+    y_pred = knn.predict(X_test)
+
+    print(str(confusion_matrix(y_test, y_pred)))
+    print(str(classification_report(y_test, y_pred)))
+
+    return knn, scaler
+
+
+def knn_predict(knn, scaler, test_dataset):
+    X_test = test_dataset.iloc[:, 0:5].values
+    X_test = scaler.transform(X_test)
+
+    y_pred = knn.predict(X_test)
+    result = pd.DataFrame({
+        'Id': test_dataset.iloc[:, 0].values,
+        'Predicted': y_pred
+    })
+
+    print(result)
+
+    return result
