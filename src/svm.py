@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+
+from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix
 
@@ -10,6 +12,12 @@ def svm_loan(train_dataset, test_dataset, eval_dataset):
     X_train = train_dataset.iloc[:, 0:5].values
     y_train = train_dataset.iloc[:, 6].values
 
+    scaler = StandardScaler()
+    scaler.fit(X_train)
+
+    X_train = scaler.transform(X_train)
+    X_test = scaler.transform(X_test)
+
     svclassifier = SVC(kernel='linear')
     svclassifier.fit(X_train, y_train)
 
@@ -19,6 +27,7 @@ def svm_loan(train_dataset, test_dataset, eval_dataset):
     print(str(classification_report(y_test, y_pred)))
 
     X_eval = eval_dataset.iloc[:, 0:5].values
+    X_eval = scaler.transform(X_eval)
 
     y_pred = svclassifier.predict(X_eval)
     result = pd.DataFrame({
