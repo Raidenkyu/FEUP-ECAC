@@ -5,9 +5,11 @@ from sklearn.model_selection import train_test_split
 
 from preprocessing import prepare_dataset
 from knn import knn_loan
+from svm import svm_loan
 
 model_switcher = {
-    "knn": knn_loan
+    "knn": knn_loan,
+    "svm": svm_loan
 }
 
 account_dataset, client_dataset, disp_dataset, district_dataset = db.parse_data()
@@ -21,7 +23,8 @@ train, test = train_test_split(
 )
 
 if len(sys.argv) < 2:
-    exit
+    print('Warning: No algorithm was chosen.\nOptions include "knn", "svm"')
+    exit()
 
 model = model_switcher.get(sys.argv[1], knn_loan)
 
