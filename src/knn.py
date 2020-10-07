@@ -7,7 +7,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 
 
-def knn_model(train_dataset, test_dataset):
+def knn_loan(train_dataset, test_dataset, eval_dataset):
     X_test = test_dataset.iloc[:, 0:5].values
     y_test = test_dataset.iloc[:, 6].values
     X_train = train_dataset.iloc[:, 0:5].values
@@ -39,16 +39,12 @@ def knn_model(train_dataset, test_dataset):
     print(str(confusion_matrix(y_test, y_pred)))
     print(str(classification_report(y_test, y_pred)))
 
-    return knn, scaler
+    X_eval = eval_dataset.iloc[:, 0:5].values
+    X_eval = scaler.transform(X_eval)
 
-
-def knn_predict(knn, scaler, test_dataset):
-    X_test = test_dataset.iloc[:, 0:5].values
-    X_test = scaler.transform(X_test)
-
-    y_pred = knn.predict(X_test)
+    y_pred = knn.predict(X_eval)
     result = pd.DataFrame({
-        'Id': test_dataset.iloc[:, 0].values,
+        'Id': eval_dataset.iloc[:, 0].values,
         'Predicted': y_pred
     })
 
