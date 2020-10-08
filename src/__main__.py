@@ -23,6 +23,9 @@ train, test = train_test_split(
     loan_train_dataset, test_size=0.25, random_state=42, shuffle=True
 )
 
+loan_test_dataset = prepare_dataset(
+    loan_test_dataset, disp_dataset, account_dataset, district_dataset, client_dataset)
+
 if len(sys.argv) < 2:
     print('Warning: No algorithm was chosen.\nOptions include "knn", "svm"')
     exit()

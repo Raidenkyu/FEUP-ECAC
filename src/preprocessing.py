@@ -1,5 +1,7 @@
 import pandas as pd
 
+from sklearn.preprocessing import OrdinalEncoder
+
 
 def prepare_dataset(train_dataset, disp, account, district, client):
     joined_client = disp.set_index("client_id", drop=False).join(
@@ -19,7 +21,10 @@ def prepare_dataset(train_dataset, disp, account, district, client):
                  "district_id_other", "account_id_other", "date_other"]
     ).dropna(subset=["loan_id"]).set_index("loan_id")
 
-    joined = pd.get_dummies(joined[~joined.index.duplicated(keep='first')])
+    joined = joined[~joined.index.duplicated(keep='first')]
+
+    enc = OrdinalEncoder()
+    joined.iloc[:, 0:21] = enc.fit_transform(joined.iloc[:, 0:21])
 
     for col in joined.columns:
         print(col)
