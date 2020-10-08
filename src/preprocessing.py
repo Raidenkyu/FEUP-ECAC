@@ -26,8 +26,4 @@ def prepare_dataset(train_dataset, disp, account, district, client):
     enc = OrdinalEncoder()
     joined.iloc[:, 0:21] = enc.fit_transform(joined.iloc[:, 0:21])
 
-    for col in joined.columns:
-        print(col)
-
-    print(joined)
     return joined

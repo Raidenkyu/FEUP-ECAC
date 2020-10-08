@@ -27,7 +27,8 @@ loan_test_dataset = prepare_dataset(
     loan_test_dataset, disp_dataset, account_dataset, district_dataset, client_dataset)
 
 if len(sys.argv) < 2:
-    print('Warning: No algorithm was chosen.\nOptions include "knn", "svm"')
+    print('Warning: No algorithm was chosen.')
+    print('Usage: python3 src <knn|svm>.')
     exit()
 
 model = model_switcher.get(sys.argv[1], knn_loan)
