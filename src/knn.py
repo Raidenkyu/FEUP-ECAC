@@ -28,7 +28,7 @@ def knn_loan(train_dataset, test_dataset, eval_dataset):
         pred_i = knn.predict(X_test)
         error.append(np.mean(pred_i != y_test))
 
-    best_k = error.index(min(error))
+    best_k = error.index(min(error)) + 1
 
     knn = KNeighborsClassifier(n_neighbors=best_k)
     knn.fit(X_train, y_train)
