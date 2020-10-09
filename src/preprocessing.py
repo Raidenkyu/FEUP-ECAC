@@ -51,9 +51,9 @@ def prepare_development_dataset(dataset, disp, account, district, client):
         dataset, disp, account, district, client
     )
 
-    filtered_dataset = remove_outliers(joined_dataset)
+    #joined_dataset = remove_outliers(joined_dataset)
 
-    return filtered_dataset
+    return joined_dataset
 
 
 def prepare_evaluation_dataset(dataset, disp, account, district, client):
