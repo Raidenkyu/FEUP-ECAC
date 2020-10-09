@@ -9,10 +9,9 @@ Execute this command, in the root of the repository, to install all dependencies
 
 ## How to run
 ```python
-python3 src
+python3 src <knn|svm>
 ```
 Execute this command, in the root of the repository, to run the project
 
 ## Authors
-* Carlos Daniel Gomes
 * João Carlos Maduro
