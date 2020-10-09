@@ -30,7 +30,7 @@ def join_and_encode_dataset(dataset, disp, account, district, client):
 
 
 def remove_outliers(dataset):
-    high = 0.99
+    high = 0.999
     low = 1 - high
     quant_df = dataset.quantile([low, high])
 
@@ -38,7 +38,12 @@ def remove_outliers(dataset):
     filtered_dataset = filtered_dataset.apply(lambda x: x[(x > quant_df.loc[low, x.name]) &
                                                           (x < quant_df.loc[high, x.name])], axis=0)
 
-    return pd.concat([filtered_dataset, dataset.loc[:, 'status']], axis=1)
+    filtered_dataset = pd.concat(
+        [filtered_dataset, dataset.loc[:, 'status']], axis=1)
+    filtered_dataset.dropna(inplace=True)
+    print(filtered_dataset)
+
+    return filtered_dataset
 
 
 def prepare_development_dataset(dataset, disp, account, district, client):
@@ -47,8 +52,6 @@ def prepare_development_dataset(dataset, disp, account, district, client):
     )
 
     filtered_dataset = remove_outliers(joined_dataset)
-    filtered_dataset.dropna(inplace=True)
-    print(filtered_dataset)
 
     return filtered_dataset
 
