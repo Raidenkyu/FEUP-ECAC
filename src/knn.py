@@ -8,10 +8,10 @@ from sklearn.metrics import classification_report, confusion_matrix
 
 
 def knn_loan(train_dataset, test_dataset, eval_dataset):
-    X_test = test_dataset.iloc[:, 0:21].values
-    y_test = test_dataset.iloc[:, 22].values
-    X_train = train_dataset.iloc[:, 0:21].values
-    y_train = train_dataset.iloc[:, 22].values
+    X_test = test_dataset.iloc[:, 0:20].values
+    y_test = test_dataset.iloc[:, 21].values
+    X_train = train_dataset.iloc[:, 0:20].values
+    y_train = train_dataset.iloc[:, 21].values
 
     scaler = StandardScaler()
     scaler.fit(X_train)
@@ -36,9 +36,9 @@ def knn_loan(train_dataset, test_dataset, eval_dataset):
     y_pred = knn.predict(X_test)
 
     print(str(confusion_matrix(y_test, y_pred)))
-    print(str(classification_report(y_test, y_pred)))
+    print(str(classification_report(y_test, y_pred, zero_division=0)))
 
-    X_eval = eval_dataset.iloc[:, 0:21].values
+    X_eval = eval_dataset.iloc[:, 0:20].values
     X_eval = scaler.transform(X_eval)
 
     id_array = map(lambda x: int(x), eval_dataset.index.values)
@@ -48,7 +48,5 @@ def knn_loan(train_dataset, test_dataset, eval_dataset):
         'Id': id_array,
         'Predicted': y_pred
     })
-
-    print(result)
 
     return result

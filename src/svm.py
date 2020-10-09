@@ -38,6 +38,4 @@ def svm_loan(train_dataset, test_dataset, eval_dataset):
         'Predicted': y_pred
     })
 
-    print(result)
-
     return result
