@@ -26,6 +26,12 @@ def join_and_encode_dataset(dataset, disp, account, district, client):
 
     joined = joined.groupby('loan_id').mean()
 
+    # more options can be specified also
+    with pd.option_context('display.max_columns', None):
+        print(joined)
+
+    exit
+
     return joined
 
 
