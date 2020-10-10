@@ -30,8 +30,6 @@ def join_and_encode_dataset(dataset, disp, account, district, client):
     with pd.option_context('display.max_columns', None):
         print(joined)
 
-    exit
-
     return joined
 
 
