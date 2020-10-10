@@ -21,10 +21,10 @@ def join_and_encode_dataset(dataset, disp, account, district, client):
                  "district_id_other", "account_id_other", "date_other", "type"]
     ).dropna(subset=["loan_id"]).set_index("loan_id")
 
-    joined = joined[~joined.index.duplicated(keep='first')]
-
     enc = OrdinalEncoder()
     joined.iloc[:, 0:21] = enc.fit_transform(joined.iloc[:, 0:21])
+
+    joined = joined.groupby('loan_id').mean()
 
     return joined
 
