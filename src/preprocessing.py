@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.preprocessing import OrdinalEncoder
 
 
-def join_and_encode_dataset(dataset, disp, account, district, client):
+def join_aux(dataset, disp, account, district, client):
     joined_client = disp.set_index("client_id", drop=False).join(
         client.set_index("client_id"), rsuffix='_other')
 
@@ -25,6 +25,33 @@ def join_and_encode_dataset(dataset, disp, account, district, client):
     joined.iloc[:, 0:21] = enc.fit_transform(joined.iloc[:, 0:21])
 
     joined = joined.groupby('loan_id').mean()
+
+    return joined
+
+
+def join_trans(dataset, trans):
+    trans_average_balance = trans[[
+        "account_id", "balance"]].groupby("account_id").min()
+
+    trans_average_amount = trans[[
+        "account_id", "amount"]].groupby("account_id").mean()
+
+    joined_trans = trans_average_amount.join(trans_average_balance)
+
+    joined = dataset.set_index("account_id", drop=False).join(
+        joined_trans, lsuffix='_loan', rsuffix='_account_average'
+    ).reindex(columns=["loan_id", "account_id", "date", "amount_loan", "duration",
+                       "payments", "amount_account_average", "balance", "status"])
+
+    joined = joined.set_index("loan_id").drop(
+        columns=["account_id"]
+    )
+
+    return joined
+
+
+def join_and_encode_dataset(dataset, trans, disp, account, district, client):
+    joined = join_trans(dataset, trans)
 
     # more options can be specified also
     with pd.option_context('display.max_columns', None):
@@ -50,19 +77,19 @@ def remove_outliers(dataset):
     return filtered_dataset
 
 
-def prepare_development_dataset(dataset, disp, account, district, client):
+def prepare_development_dataset(dataset, trans, disp, account, district, client):
     joined_dataset = join_and_encode_dataset(
-        dataset, disp, account, district, client
+        dataset, trans, disp, account, district, client
     )
 
-    #joined_dataset = remove_outliers(joined_dataset)
+    # joined_dataset = remove_outliers(joined_dataset)
 
     return joined_dataset
 
 
-def prepare_evaluation_dataset(dataset, disp, account, district, client):
+def prepare_evaluation_dataset(dataset, trans, disp, account, district, client):
     joined_dataset = join_and_encode_dataset(
-        dataset, disp, account, district, client
+        dataset, trans, disp, account, district, client
     )
 
     return joined_dataset
