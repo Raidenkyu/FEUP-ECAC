@@ -4,12 +4,15 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from preprocessing import prepare_development_dataset, prepare_evaluation_dataset
+
 from knn import knn_loan
 from svm import svm_loan
+from crforest import crforest_loan
 
 model_switcher = {
     "knn": knn_loan,
-    "svm": svm_loan
+    "svm": svm_loan,
+    "forest": crforest_loan
 }
 
 account_dataset, client_dataset, disp_dataset, district_dataset = db.parse_data()
