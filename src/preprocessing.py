@@ -36,12 +36,17 @@ def join_trans(dataset, trans):
     trans_average_amount = trans[[
         "account_id", "amount"]].groupby("account_id").mean()
 
+    trans_average_type = trans[[
+        "account_id", "type"]].groupby("account_id").agg(lambda x:x.value_counts().index[0])
+
     joined_trans = trans_average_amount.join(trans_average_balance)
+    joined_trans = joined_trans.join(trans_average_type)
+    joined_trans = joined_trans.replace(['withdrawal','credit'],[0,1])
 
     joined = dataset.set_index("account_id", drop=False).join(
         joined_trans, lsuffix='_loan', rsuffix='_account_average'
     ).reindex(columns=["loan_id", "account_id", "date", "amount_loan", "duration",
-                       "payments", "amount_account_average", "balance", "status"])
+                       "payments", "amount_account_average", "balance","type", "status"])
 
     joined = joined.set_index("loan_id").drop(
         columns=["account_id"]
