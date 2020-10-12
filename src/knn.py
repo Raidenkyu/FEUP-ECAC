@@ -32,6 +32,9 @@ def knn_loan(train_dataset, test_dataset, eval_dataset):
 
     best_k = auc.index(max(auc)) + 1
 
+    fpr, tpr, _thresholds = metrics.roc_curve(y_test, pred_i)
+    print(f"AUC: {metrics.auc(fpr, tpr)}")
+
     knn = KNeighborsClassifier(n_neighbors=best_k)
     knn.fit(X_train, y_train)
 
@@ -39,6 +42,7 @@ def knn_loan(train_dataset, test_dataset, eval_dataset):
 
     print(str(confusion_matrix(y_test, y_pred)))
     print(str(classification_report(y_test, y_pred, zero_division=0)))
+    
 
     X_eval = eval_dataset.drop(columns=["status"]).values
     X_eval = scaler.transform(X_eval)
