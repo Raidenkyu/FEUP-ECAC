@@ -18,7 +18,7 @@ def svm_loan(train_dataset, test_dataset, eval_dataset):
     X_train = scaler.transform(X_train)
     X_test = scaler.transform(X_test)
 
-    svclassifier = SVC(kernel='sigmoid')
+    svclassifier = SVC(gamma='auto')
     svclassifier.fit(X_train, y_train)
 
     y_pred = svclassifier.predict(X_test)
