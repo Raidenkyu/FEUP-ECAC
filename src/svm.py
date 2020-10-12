@@ -3,7 +3,7 @@ import numpy as np
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
 
 
 def svm_loan(train_dataset, test_dataset, eval_dataset):
@@ -25,6 +25,7 @@ def svm_loan(train_dataset, test_dataset, eval_dataset):
 
     print(str(confusion_matrix(y_test, y_pred)))
     print(str(classification_report(y_test, y_pred, zero_division=0)))
+    print(f"AUC: {roc_auc_score(y_test, y_pred)}")
 
     X_eval = eval_dataset.drop(columns=["status"]).values
     X_eval = scaler.transform(X_eval)

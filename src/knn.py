@@ -2,10 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from sklearn import metrics
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
 
 
 def knn_loan(train_dataset, test_dataset, eval_dataset):
@@ -27,8 +26,7 @@ def knn_loan(train_dataset, test_dataset, eval_dataset):
         knn = KNeighborsClassifier(n_neighbors=i)
         knn.fit(X_train, y_train)
         pred_i = knn.predict(X_test)
-        fpr, tpr, _thresholds = metrics.roc_curve(y_test, pred_i)
-        auc.append(metrics.auc(fpr, tpr))
+        auc.append(roc_auc_score(y_test, pred_i))
 
     best_k = auc.index(max(auc)) + 1
 
@@ -39,6 +37,7 @@ def knn_loan(train_dataset, test_dataset, eval_dataset):
 
     print(str(confusion_matrix(y_test, y_pred)))
     print(str(classification_report(y_test, y_pred, zero_division=0)))
+    print(f"AUC: {roc_auc_score(y_test, y_pred)}")
 
     X_eval = eval_dataset.drop(columns=["status"]).values
     X_eval = scaler.transform(X_eval)
