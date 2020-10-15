@@ -29,33 +29,46 @@ def join_aux(dataset, disp, account, district, client):
     return joined
 
 
-def join_trans(dataset, trans):
-    trans_average_balance = trans[[
+def join_trans(dataset, disp, client, district, trans):
+     trans_min_balance = trans[[
         "account_id", "balance"]].groupby("account_id").min()
+
+    trans_average_balance = trans[[
+        "account_id", "balance"]].groupby("account_id").mean()
 
     trans_average_amount = trans[[
         "account_id", "amount"]].groupby("account_id").mean()
+    
 
-    trans_average_type = trans[[
-        "account_id", "type"]].groupby("account_id").agg(lambda x:x.value_counts().index[0])
+    joined_client = district.set_index("code ", drop=False).join(
+        client.set_index("district_id", drop=False))
 
-    joined_trans = trans_average_amount.join(trans_average_balance)
-    joined_trans = joined_trans.join(trans_average_type)
+    joined_client = disp.set_index("client_id", drop=False).join(
+        joined_client.set_index("client_id"))
 
+    joined_client = joined_client[["account_id", "unemploymant rate '95 ", "unemploymant rate '96 "]].groupby("account_id").mean()
+    
+    print(joined_client)
+
+    joined_trans = joined_client.join(trans_average_balance)
+    joined_trans = trans_average_amount.join(joined_trans)
+    
+    
     joined = dataset.set_index("account_id", drop=False).join(
         joined_trans, lsuffix='_loan', rsuffix='_account_average'
     ).reindex(columns=["loan_id", "account_id", "date", "amount_loan", "duration",
-                       "payments", "amount_account_average", "balance", "status"])
+                       "payments", "amount_account_average", "balance","average salary ", "status"])
 
     joined = joined.set_index("loan_id").drop(
         columns=["account_id"]
     )
 
+
     return joined
 
 
 def join_and_encode_dataset(dataset, trans, disp, account, district, client):
-    joined = join_trans(dataset, trans)
+    joined = join_trans(dataset, disp, client, district, trans)
 
     # more options can be specified also
     with pd.option_context('display.max_columns', None):
