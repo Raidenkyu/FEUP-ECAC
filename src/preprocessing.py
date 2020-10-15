@@ -41,12 +41,11 @@ def join_trans(dataset, trans):
 
     joined_trans = trans_average_amount.join(trans_average_balance)
     joined_trans = joined_trans.join(trans_average_type)
-    joined_trans = joined_trans.replace(['withdrawal','credit'],[0,1])
 
     joined = dataset.set_index("account_id", drop=False).join(
         joined_trans, lsuffix='_loan', rsuffix='_account_average'
     ).reindex(columns=["loan_id", "account_id", "date", "amount_loan", "duration",
-                       "payments", "amount_account_average", "balance","type", "status"])
+                       "payments", "amount_account_average", "balance", "status"])
 
     joined = joined.set_index("loan_id").drop(
         columns=["account_id"]

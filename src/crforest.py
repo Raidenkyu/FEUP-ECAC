@@ -3,8 +3,7 @@ import numpy as np
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, confusion_matrix
-from sklearn import metrics
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
 
 
 def crforest_loan(train_dataset, test_dataset, eval_dataset):
@@ -26,8 +25,7 @@ def crforest_loan(train_dataset, test_dataset, eval_dataset):
 
     print(str(confusion_matrix(y_test, y_pred)))
     print(str(classification_report(y_test, y_pred, zero_division=0)))
-    fpr, tpr, _thresholds = metrics.roc_curve(y_test, pred_i)
-    print(f"AUC: {metrics.auc(fpr, tpr)}")
+    print(f"AUC: {roc_auc_score(y_test, y_pred)}")
 
     X_eval = eval_dataset.drop(columns=["status"]).values
     X_eval = scaler.transform(X_eval)
