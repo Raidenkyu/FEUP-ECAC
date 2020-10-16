@@ -4,9 +4,17 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
+from sklearn.utils import resample
 
 
 def crforest_loan(train_dataset, test_dataset, eval_dataset):
+    train_dataset_classes = resample(
+        train_dataset[train_dataset["status"] == 1],
+        n_samples=len(train_dataset[train_dataset["status"] != 1]), replace=False)
+
+    train_dataset = pd.concat(
+        [train_dataset_classes, train_dataset[train_dataset["status"] == -1]])
+
     X_test = test_dataset.drop(columns=["status"]).values
     y_test = test_dataset.iloc[:, -1].values
     X_train = train_dataset.drop(columns=["status"]).values
