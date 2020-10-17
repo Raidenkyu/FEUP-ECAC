@@ -8,11 +8,13 @@ from preprocessing import prepare_development_dataset, prepare_evaluation_datase
 from knn import knn_loan
 from svm import svm_loan
 from crforest import crforest_loan
+from xg_boost import xg_boost
 
 model_switcher = {
     "knn": knn_loan,
     "svm": svm_loan,
-    "forest": crforest_loan
+    "forest": crforest_loan,
+    "xgboost": xg_boost 
 }
 
 account_dataset, client_dataset, disp_dataset, district_dataset = db.parse_data()
@@ -33,6 +35,39 @@ if len(sys.argv) < 2:
     print('Warning: No algorithm was chosen.')
     print('Usage: python3 src <knn|svm>.')
     exit()
+def remove_outliers(dataset):
+    high = 0.999
+    low = 1 - high
+    quant_df = dataset.quantile([low, high])
+
+    filtered_dataset = dataset.loc[:, dataset.columns != 'status']
+    filtered_dataset = filtered_dataset.apply(lambda x: x[(x > quant_df.loc[low, x.name]) &
+                                                          (x < quant_df.loc[high, x.name])], axis=0)
+
+    filtered_dataset = pd.concat(
+        [filtered_dataset, dataset.loc[:, 'status']], axis=1)
+    filtered_dataset.dropna(inplace=True)
+    print(filtered_dataset)
+
+    return filtered_dataset
+
+
+def prepare_development_dataset(dataset, trans, disp, account, district, client):
+    joined_dataset = join_and_encode_dataset(
+        dataset, trans, disp, account, district, client
+    )
+
+    # joined_dataset = remove_outliers(joined_dataset)
+
+    return joined_dataset
+
+
+def prepare_evaluation_dataset(dataset, trans, disp, account, district, client):
+    joined_dataset = join_and_encode_dataset(
+        dataset, trans, disp, account, district, client
+    )
+
+    return joined_dataset
 
 model = model_switcher.get(sys.argv[1], knn_loan)
 
