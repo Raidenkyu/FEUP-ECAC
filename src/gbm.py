@@ -2,11 +2,11 @@ import pandas as pd
 import numpy as np
 
 from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, accuracy_score
 
 
-def crforest_loan(train_dataset, test_dataset, eval_dataset):
+def gbm(train_dataset, test_dataset, eval_dataset):
     X_test = test_dataset.drop(columns=["status"]).values
     y_test = test_dataset.iloc[:, -1].values
     X_train = train_dataset.drop(columns=["status"]).values
@@ -14,13 +14,13 @@ def crforest_loan(train_dataset, test_dataset, eval_dataset):
 
     scaler = StandardScaler()
 
-    X_train, y_train = scaler.fit_resample(X_train, y_train)
-    ##scaler.fit(X_train)
+    #X_train, y_train = .fit_resample(X_train, y_train)
+    scaler.fit(X_train)
 
     X_train = scaler.transform(X_train)
     X_test = scaler.transform(X_test)
 
-    clf = RandomForestClassifier(max_depth=2, random_state=0)
+    clf = GradientBoostingClassifier(max_depth=15, random_state=0)
     clf.fit(X_train, y_train)
 
     y_pred = clf.predict(X_test)
