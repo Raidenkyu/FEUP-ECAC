@@ -13,6 +13,8 @@ def crforest_loan(train_dataset, test_dataset, eval_dataset):
     y_train = train_dataset.iloc[:, -1].values
 
     scaler = StandardScaler()
+
+    # X_train, y_train = .fit_resample(X_train, y_train)
     scaler.fit(X_train)
 
     X_train = scaler.transform(X_train)
