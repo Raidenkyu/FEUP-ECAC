@@ -1,6 +1,7 @@
 import pandas as pd
 
 from sklearn.preprocessing import OrdinalEncoder
+from sklearn.utils import resample
 
 
 def join_aux(dataset, disp, account, district, client):
@@ -28,6 +29,7 @@ def join_aux(dataset, disp, account, district, client):
 
     return joined
 
+
 def join_client(disp, client, district):
 
     joined_client = district.set_index("code ", drop=False).join(
@@ -35,11 +37,11 @@ def join_client(disp, client, district):
 
     joined_client = disp.set_index("client_id", drop=False).join(
         joined_client.set_index("client_id"))
-    
-    joined_client = joined_client[["account_id","average salary ","unemploymant rate '95 ", "unemploymant rate '96 ","no. of commited crimes '95 "]].groupby("account_id").min() ##ADICIONAR FATORES EXTERNOS AQUI
+
+    joined_client = joined_client[["account_id", "average salary ", "unemploymant rate '95 ", "unemploymant rate '96 ",
+                                   "no. of commited crimes '95 "]].groupby("account_id").min()  # ADICIONAR FATORES EXTERNOS AQUI
 
     return joined_client
-
 
 
 def join_trans(dataset, trans):
@@ -118,3 +120,21 @@ def prepare_evaluation_dataset(dataset, trans, disp, account, district, client):
     )
 
     return joined_dataset
+
+
+def up_sampling(train_dataset):
+    train_dataset_classes = resample(
+        train_dataset[train_dataset["status"] == -1],
+        n_samples=len(train_dataset[train_dataset["status"] != -1]))
+
+    return pd.concat(
+        [train_dataset_classes, train_dataset[train_dataset["status"] == 1]])
+
+
+def down_sampling(train_dataset):
+    train_dataset_classes = resample(
+        train_dataset[train_dataset["status"] == 1],
+        n_samples=len(train_dataset[train_dataset["status"] != 1]))
+
+    return pd.concat(
+        [train_dataset_classes, train_dataset[train_dataset["status"] == -1]])
