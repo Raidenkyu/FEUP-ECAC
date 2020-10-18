@@ -1,6 +1,7 @@
 import pandas as pd
 
 from sklearn.preprocessing import OrdinalEncoder
+from sklearn.utils import resample
 
 
 def join_aux(dataset, disp, account, district, client):
@@ -105,3 +106,21 @@ def prepare_evaluation_dataset(dataset, trans, disp, account, district, client):
     )
 
     return joined_dataset
+
+
+def up_sampling(train_dataset):
+    train_dataset_classes = resample(
+        train_dataset[train_dataset["status"] == -1],
+        n_samples=len(train_dataset[train_dataset["status"] != -1]))
+
+    return pd.concat(
+        [train_dataset_classes, train_dataset[train_dataset["status"] == 1]])
+
+
+def down_sampling(train_dataset):
+    train_dataset_classes = resample(
+        train_dataset[train_dataset["status"] == 1],
+        n_samples=len(train_dataset[train_dataset["status"] != 1]))
+
+    return pd.concat(
+        [train_dataset_classes, train_dataset[train_dataset["status"] == -1]])
