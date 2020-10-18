@@ -7,22 +7,23 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, accuracy_score
 
+from preprocessing import up_sampling
+
 
 def xg_boost(train_dataset, test_dataset, eval_dataset):
+    train_dataset = up_sampling(train_dataset)
+
     X_test = test_dataset.drop(columns=["status"]).values
     y_test = test_dataset.iloc[:, -1].values
     X_train = train_dataset.drop(columns=["status"]).values
     y_train = train_dataset.iloc[:, -1].values
 
     scaler = StandardScaler()
-
-    #X_train, y_train = .fit_resample(X_train, y_train)
     scaler.fit(X_train)
 
     X_train = scaler.transform(X_train)
     X_test = scaler.transform(X_test)
 
-    
     model = XGBClassifier()
     model.fit(X_train, y_train)
     print(model)

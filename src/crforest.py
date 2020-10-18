@@ -9,7 +9,7 @@ from preprocessing import up_sampling
 
 
 def crforest_loan(train_dataset, test_dataset, eval_dataset):
-    train_dataset_classes = up_sampling(train_dataset)
+    train_dataset = up_sampling(train_dataset)
 
     X_test = test_dataset.drop(columns=["status"]).values
     y_test = test_dataset.iloc[:, -1].values
@@ -17,9 +17,7 @@ def crforest_loan(train_dataset, test_dataset, eval_dataset):
     y_train = train_dataset.iloc[:, -1].values
 
     scaler = StandardScaler()
-
-    X_train, y_train = scaler.fit_resample(X_train, y_train)
-    ##scaler.fit(X_train)
+    scaler.fit(X_train)
 
     X_train = scaler.transform(X_train)
     X_test = scaler.transform(X_test)
