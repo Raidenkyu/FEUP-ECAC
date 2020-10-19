@@ -11,7 +11,7 @@ from preprocessing import down_sampling
 
 
 def xg_boost(train_dataset, test_dataset, eval_dataset):
-    #train_dataset = up_sampling(train_dataset)
+    train_dataset = down_sampling(train_dataset)
 
     X_test = test_dataset.drop(columns=["status"]).values
     y_test = test_dataset.iloc[:, -1].values

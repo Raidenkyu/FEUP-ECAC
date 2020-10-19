@@ -68,7 +68,7 @@ def join_trans(dataset, trans):
         joined_trans, lsuffix='_loan', rsuffix='_account_average'
     ).reindex(columns=["loan_id", "account_id", "amount_loan",
                        "payments", "amount_account_average", "balance_account_minimum",
-                       "balance_account_average", "trans_count", "status"])
+                       "balance_account_average", "status"])
 
     joined = joined.set_index("loan_id").drop(
         columns=["account_id"]
