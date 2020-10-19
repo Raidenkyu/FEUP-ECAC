@@ -134,7 +134,7 @@ def up_sampling(train_dataset):
 def down_sampling(train_dataset):
     train_dataset_classes = resample(
         train_dataset[train_dataset["status"] == 1],
-        n_samples=len(train_dataset[train_dataset["status"] != 1]))
+        n_samples=len(train_dataset[train_dataset["status"] != 1]), replace=False)
 
     return pd.concat(
         [train_dataset_classes, train_dataset[train_dataset["status"] == -1]])
