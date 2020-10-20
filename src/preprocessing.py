@@ -38,8 +38,7 @@ def join_client(disp, client, district):
     joined_client = disp.set_index("client_id", drop=False).join(
         joined_client.set_index("client_id"))
 
-    joined_client = joined_client[["account_id", "average salary ", "unemploymant rate '95 ", "unemploymant rate '96 ",
-                                   "no. of commited crimes '95 "]].groupby("account_id").min()  # ADICIONAR FATORES EXTERNOS AQUI
+    joined_client = joined_client[["account_id", "ratio of urban inhabitants "]].groupby("account_id").min()  # ADICIONAR FATORES EXTERNOS AQUI
 
     return joined_client
 
@@ -70,22 +69,23 @@ def join_trans(dataset, trans):
     joined_trans = joined_trans.join(
         trans_average_balance, lsuffix="_account_minimum", rsuffix="_account_average")
 
+    return joined_trans
+
+
+def join_and_encode_dataset(dataset, trans, disp, account, district, client):
+    joined1 = join_trans(dataset, trans)
+    joined2 = join_client(disp,client,district)
+    joined3 = joined1.join(joined2)
 
     joined = dataset.set_index("account_id", drop=False).join(
-        joined_trans, lsuffix='_loan', rsuffix='_account_average'
+        joined3, lsuffix='_loan', rsuffix='_account_average'
     ).reindex(columns=["loan_id", "date", "account_id", "amount_loan",
                        "payments", "amount_account_average", "balance_account_minimum",
-                       "balance_account_average","type", "status"])
+                       "balance_account_average","type", "ratio of urban inhabitants ","status"])
 
     joined = joined.set_index("loan_id").drop(
         columns=["account_id"]
     )
-
-    return joined
-
-
-def join_and_encode_dataset(dataset, trans, disp, account, district, client):
-    joined = join_trans(dataset, trans)
 
     # more options can be specified also
     with pd.option_context('display.max_columns', None):
