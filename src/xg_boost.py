@@ -9,9 +9,14 @@ from sklearn.metrics import classification_report, confusion_matrix, roc_auc_sco
 
 from preprocessing import down_sampling
 
+max_AUC = 0
+current_AUC = 0
+
 
 def xg_boost(train_dataset, test_dataset, eval_dataset):
-    #train_dataset = up_sampling(train_dataset)
+    global current_AUC, max_AUC
+    
+    train_dataset = down_sampling(train_dataset)
 
     X_test = test_dataset.drop(columns=["status"]).values
     y_test = test_dataset.iloc[:, -1].values
@@ -32,9 +37,12 @@ def xg_boost(train_dataset, test_dataset, eval_dataset):
     predictions = [round(value) for value in y_pred]
     accuracy = accuracy_score(y_test, predictions)
 
+    current_AUC = roc_auc_score(y_test, y_pred)
+    
     print(str(confusion_matrix(y_test, y_pred)))
     print(str(classification_report(y_test, y_pred, zero_division=0)))
-    print(f"AUC: {roc_auc_score(y_test, y_pred)}")
+    print(f"Current AUC: {current_AUC}")
+    print(f"Previous Max AUC: {max_AUC}")
     print("Accuracy: %.2f%%" % (accuracy * 100.0))
 
     X_eval = eval_dataset.drop(columns=["status"]).values
@@ -47,5 +55,10 @@ def xg_boost(train_dataset, test_dataset, eval_dataset):
         'Id': id_array,
         'Predicted': y_pred
     })
+
+    if(current_AUC > max_AUC):
+        
+        result.to_csv('max_output.csv', index=False)
+        max_AUC = current_AUC
 
     return result

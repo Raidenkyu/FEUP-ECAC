@@ -56,19 +56,20 @@ def join_trans(dataset, trans):
 
     trans_count = trans[[
         "account_id"]].groupby("account_id").size().to_frame(name='trans_count')
+    
+    dataset['date'] = dataset['date'].div(1000)
 
     joined_trans = trans_average_amount.join(trans_min_balance)
 
     joined_trans = joined_trans.join(
         trans_average_balance, lsuffix="_account_minimum", rsuffix="_account_average")
 
-    joined_trans = joined_trans.join(trans_count)
 
     joined = dataset.set_index("account_id", drop=False).join(
         joined_trans, lsuffix='_loan', rsuffix='_account_average'
-    ).reindex(columns=["loan_id", "account_id", "amount_loan",
+    ).reindex(columns=["loan_id", "date", "account_id", "amount_loan",
                        "payments", "amount_account_average", "balance_account_minimum",
-                       "balance_account_average", "trans_count", "status"])
+                       "balance_account_average", "status"])
 
     joined = joined.set_index("loan_id").drop(
         columns=["account_id"]
