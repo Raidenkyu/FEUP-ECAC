@@ -24,7 +24,7 @@ loan_test_dataset, trans_test_dataset = db.parse_test()
 loan_train_dataset = prepare_development_dataset(
     loan_train_dataset, trans_train_dataset, disp_dataset, account_dataset, district_dataset, client_dataset)
 
-train, test = train_test_split(loan_train_dataset, test_size=0.35, random_state=42, shuffle=True)
+train, test = train_test_split(loan_train_dataset, test_size=0.25, random_state=42, shuffle=True)
 
 
 loan_test_dataset = prepare_evaluation_dataset(
@@ -68,12 +68,10 @@ def prepare_evaluation_dataset(dataset, trans, disp, account, district, client):
 
     return joined_dataset
 
-while(1):
-   
-    model = model_switcher.get(sys.argv[1], knn_loan)
+model = model_switcher.get(sys.argv[1], knn_loan)
 
-    result = model(train, test, loan_test_dataset)
-    
-    result.to_csv('output.csv', index=False)
+result = model(train, test, loan_test_dataset)
+
+result.to_csv('output.csv', index=False)
 
 
