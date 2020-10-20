@@ -7,7 +7,7 @@ from preprocessing import prepare_development_dataset, prepare_evaluation_datase
 
 from knn import knn_loan
 from svm import svm_loan
-from crforest import crforest_loan, max_AUC, current_AUC #switch these last two imports to being from xg_boost to test that algorithm
+from crforest import crforest_loan # max_AUC, current_AUC #switch these last two imports to being from xg_boost to test that algorithm
 from xg_boost import xg_boost
 
 model_switcher = {
