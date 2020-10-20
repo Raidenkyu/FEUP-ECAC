@@ -53,13 +53,19 @@ def join_trans(dataset, trans):
 
     trans_average_amount = trans[[
         "account_id", "amount"]].groupby("account_id").mean()
+    
+    trans_average_type = trans[[
+        "account_id", "type"]].groupby("account_id").agg(lambda x:x.value_counts().index[0])
 
     trans_count = trans[[
         "account_id"]].groupby("account_id").size().to_frame(name='trans_count')
     
-    dataset['date'] = dataset['date'].div(1000)
+    dataset['date'] = dataset['date'] // 10000
 
     joined_trans = trans_average_amount.join(trans_min_balance)
+
+    joined_trans = joined_trans.join(trans_average_type)
+    joined_trans = joined_trans.replace(['withdrawal','credit'],[0,1])
 
     joined_trans = joined_trans.join(
         trans_average_balance, lsuffix="_account_minimum", rsuffix="_account_average")
@@ -69,7 +75,7 @@ def join_trans(dataset, trans):
         joined_trans, lsuffix='_loan', rsuffix='_account_average'
     ).reindex(columns=["loan_id", "date", "account_id", "amount_loan",
                        "payments", "amount_account_average", "balance_account_minimum",
-                       "balance_account_average", "status"])
+                       "balance_account_average","type", "status"])
 
     joined = joined.set_index("loan_id").drop(
         columns=["account_id"]
