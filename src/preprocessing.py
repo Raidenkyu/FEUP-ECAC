@@ -40,10 +40,26 @@ def join_client(disp, client, district):
     joined_client = disp.set_index("client_id", drop=False).join(
         joined_client.set_index("client_id"))
 
-    joined_client = joined_client[["account_id", "ratio of urban inhabitants "]].groupby(
-        "account_id").min()  # ADICIONAR FATORES EXTERNOS AQUI
+    joined_client = joined_client[["account_id", "ratio of urban inhabitants ","region","no. of inhabitants",
+                       "no. of cities ","average salary ","unemploymant rate '95 ",
+                       "unemploymant rate '96 ","no. of enterpreneurs per 1000 inhabitants ",
+                       "no. of commited crimes '95 ","no. of commited crimes '96 "]].groupby(        "account_id").min() # ADICIONAR FATORES EXTERNOS AQUI
+
+    
+    joined_client = joined_client.replace(['Prague', 'central Bohemia','east Bohemia',
+    'south Bohemia', 'north Bohemia', 'west Bohemia','north Moravia','south Moravia'],
+     [0,1,2,3,4,5,6,7])
+
+    joined_client = joined_client.replace('?', 0)
+    joined_client = joined_client.replace(np.nan, 0)
+    
+    joined_client = joined_client.astype('float64')
+
 
     return joined_client
+
+def percentage_credit(series):
+    return series.isin(['credit']).sum(axis=0)/len(series)
 
 
 def join_trans(dataset, trans):
@@ -57,7 +73,9 @@ def join_trans(dataset, trans):
         "account_id", "amount"]].groupby("account_id").mean()
 
     trans_average_type = trans[[
-        "account_id", "type"]].groupby("account_id").agg(lambda x: x.value_counts().index[0])
+        "account_id", "type"]].groupby("account_id").agg({'type': percentage_credit})
+
+       
 
     trans_count = trans[[
         "account_id"]].groupby("account_id").size().to_frame(name='trans_count')
@@ -65,10 +83,9 @@ def join_trans(dataset, trans):
     dataset['date'] = dataset['date'] // 10000
 
     joined_trans = trans_average_amount.join(trans_min_balance)
-
     joined_trans = joined_trans.join(trans_average_type)
     joined_trans = joined_trans.join(trans_count)
-    joined_trans = joined_trans.replace(['withdrawal', 'credit'], [0, 1])
+    
 
     joined_trans = joined_trans.join(
         trans_average_balance, lsuffix="_account_minimum", rsuffix="_account_average")
@@ -85,15 +102,20 @@ def join_and_encode_dataset(dataset, trans, disp, account, district, client):
         joined3, lsuffix='_loan', rsuffix='_account_average'
     ).reindex(columns=["loan_id", "date", "account_id", "amount_loan",
                        "payments", "amount_account_average", "balance_account_minimum",
-                       "balance_account_average", "trans_count", "type", "ratio of urban inhabitants ", "status"])
+                       "balance_account_average", "trans_count", "type", 
+                       "ratio of urban inhabitants ","region","no. of inhabitants",
+                       "no. of cities ","average salary ","unemploymant rate '95 ",
+                       "unemploymant rate '96 ","no. of enterpreneurs per 1000 inhabitants ",
+                       "no. of commited crimes '95 ","no. of commited crimes '96 ","status"])
 
     joined = joined.set_index("loan_id").drop(
         columns=["account_id"]
     )
+    
 
     # more options can be specified also
     with pd.option_context('display.max_columns', None):
-        print(joined3)
+        print(joined)
 
     return joined
 
