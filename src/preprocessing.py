@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-
+from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.utils import resample
 import statsmodels.api as sm
@@ -32,6 +32,31 @@ def join_aux(dataset, disp, account, district, client):
     return joined
 
 
+def crime95_f(data):
+
+   
+    vara = int(data["no. of commited crimes '95 "].min())
+    d = pd.DataFrame({
+        'account_id': data['account_id'],
+        'crime_rate_95': vara / 
+        data["no. of inhabitants"]
+    })
+    
+    return d
+
+def crime96_f(data):
+
+   
+    vara = int(data["no. of commited crimes '96 "].min())
+    d = pd.DataFrame({
+        'account_id': data['account_id'],
+        'crime_rate_96': vara / 
+        data["no. of inhabitants"]
+    })
+    
+    return d
+
+
 def join_client(disp, client, district):
 
     joined_client = district.set_index("code ", drop=False).join(
@@ -40,23 +65,36 @@ def join_client(disp, client, district):
     joined_client = disp.set_index("client_id", drop=False).join(
         joined_client.set_index("client_id"))
 
-    joined_client = joined_client[["account_id", "ratio of urban inhabitants ","region","no. of inhabitants",
-                       "no. of cities ","average salary ","unemploymant rate '95 ",
-                       "unemploymant rate '96 ","no. of enterpreneurs per 1000 inhabitants ",
-                       "no. of commited crimes '95 ","no. of commited crimes '96 "]].groupby(        "account_id").min() # ADICIONAR FATORES EXTERNOS AQUI
+    joined_client = joined_client.replace('?', np.nan)
+    joined_client = joined_client.fillna(joined_client.mean())
 
-    
-    joined_client = joined_client.replace(['Prague', 'central Bohemia','east Bohemia',
-    'south Bohemia', 'north Bohemia', 'west Bohemia','north Moravia','south Moravia'],
-     [0,1,2,3,4,5,6,7])
+    crime_95 = joined_client[[
+        "account_id", "no. of commited crimes '95 ", "no. of inhabitants"]].groupby("account_id").apply(crime95_f)
 
-    joined_client = joined_client.replace('?', 0)
-    joined_client = joined_client.replace(np.nan, 0)
-    
+    crime_96 = joined_client[[
+        "account_id", "no. of commited crimes '96 ", "no. of inhabitants"]].groupby("account_id").apply(crime96_f)
+
+
+    joined_client = joined_client[["account_id", "ratio of urban inhabitants ", "region", "no. of inhabitants",
+                                   "no. of cities ", "average salary ", "no. of enterpreneurs per 1000 inhabitants "
+                                   ,"unemploymant rate '95 ",
+                       "unemploymant rate '96 "]].groupby("account_id").min()  # ADICIONAR FATORES EXTERNOS AQUI
+
+    joined_client = joined_client.replace(['Prague', 'central Bohemia', 'east Bohemia',
+                                           'south Bohemia', 'north Bohemia', 'west Bohemia', 'north Moravia', 'south Moravia'],
+                                          [0, 1, 2, 3, 4, 5, 6, 7])
+
+    joined_client = joined_client.join(crime_95, rsuffix="_95")
+    joined_client = joined_client.join(crime_96, rsuffix="_96")
+
+    c = joined_client.select_dtypes(np.floating).columns
+    joined_client[c] = imp.fit_transform(joined_client[c])
+
     joined_client = joined_client.astype('float64')
-
+    print(joined_client)
 
     return joined_client
+
 
 def percentage_credit(series):
     return series.isin(['credit']).sum(axis=0)/len(series)
@@ -75,8 +113,6 @@ def join_trans(dataset, trans):
     trans_average_type = trans[[
         "account_id", "type"]].groupby("account_id").agg({'type': percentage_credit})
 
-       
-
     trans_count = trans[[
         "account_id"]].groupby("account_id").size().to_frame(name='trans_count')
 
@@ -85,7 +121,6 @@ def join_trans(dataset, trans):
     joined_trans = trans_average_amount.join(trans_min_balance)
     joined_trans = joined_trans.join(trans_average_type)
     joined_trans = joined_trans.join(trans_count)
-    
 
     joined_trans = joined_trans.join(
         trans_average_balance, lsuffix="_account_minimum", rsuffix="_account_average")
@@ -102,21 +137,23 @@ def join_and_encode_dataset(dataset, trans, disp, account, district, client):
         joined3, lsuffix='_loan', rsuffix='_account_average'
     ).reindex(columns=["loan_id", "date", "account_id", "amount_loan",
                        "payments", "amount_account_average", "balance_account_minimum",
-                       "balance_account_average", "trans_count", "type", 
-                       "ratio of urban inhabitants ","region","no. of inhabitants",
-                       "no. of cities ","average salary ","unemploymant rate '95 ",
-                       "unemploymant rate '96 ","no. of enterpreneurs per 1000 inhabitants ",
-                       "no. of commited crimes '95 ","no. of commited crimes '96 ","status"])
+                       "balance_account_average", "trans_count", "type",
+                       "ratio of urban inhabitants ", "region", "no. of inhabitants",
+                       "no. of cities ", "average salary ", "unemploymant rate '95 ",
+                       "unemploymant rate '96 ", "no. of enterpreneurs per 1000 inhabitants ",
+                       "crime_rate_95", "crime_rate_96", "status"])
 
     joined = joined.set_index("loan_id").drop(
         columns=["account_id"]
     )
-    
 
     # more options can be specified also
     with pd.option_context('display.max_columns', None):
         print(joined)
 
+    imp = SimpleImputer(missing_values=np.nan, strategy='mean')
+    c = joined.select_dtypes(np.floating).columns
+    joined[c] = imp.fit_transform(joined[c])
     return joined
 
 
