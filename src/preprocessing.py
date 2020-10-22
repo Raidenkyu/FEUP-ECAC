@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.utils import resample
 import statsmodels.api as sm
@@ -33,27 +32,30 @@ def join_aux(dataset, disp, account, district, client):
 
 
 def crime95_f(data):
+    crimes_count = data["no. of commited crimes '95 "]
+    crimes_count = crimes_count.fillna(0)
+    vara = int(crimes_count.min())
 
-   
-    vara = int(data["no. of commited crimes '95 "].min())
     d = pd.DataFrame({
         'account_id': data['account_id'],
-        'crime_rate_95': vara / 
+        'crime_rate_95': vara /
         data["no. of inhabitants"]
     })
-    
+
     return d
 
-def crime96_f(data):
 
-   
-    vara = int(data["no. of commited crimes '96 "].min())
+def crime96_f(data):
+    crimes_count = data["no. of commited crimes '96 "]
+    crimes_count = crimes_count.fillna(0)
+    vara = int(crimes_count.min())
+
     d = pd.DataFrame({
         'account_id': data['account_id'],
-        'crime_rate_96': vara / 
+        'crime_rate_96': vara /
         data["no. of inhabitants"]
     })
-    
+
     return d
 
 
@@ -74,11 +76,9 @@ def join_client(disp, client, district):
     crime_96 = joined_client[[
         "account_id", "no. of commited crimes '96 ", "no. of inhabitants"]].groupby("account_id").apply(crime96_f)
 
-
     joined_client = joined_client[["account_id", "ratio of urban inhabitants ", "region", "no. of inhabitants",
-                                   "no. of cities ", "average salary ", "no. of enterpreneurs per 1000 inhabitants "
-                                   ,"unemploymant rate '95 ",
-                       "unemploymant rate '96 "]].groupby("account_id").min()  # ADICIONAR FATORES EXTERNOS AQUI
+                                   "no. of cities ", "average salary ", "no. of enterpreneurs per 1000 inhabitants ", "unemploymant rate '95 ",
+                                   "unemploymant rate '96 "]].groupby("account_id").min()  # ADICIONAR FATORES EXTERNOS AQUI
 
     joined_client = joined_client.replace(['Prague', 'central Bohemia', 'east Bohemia',
                                            'south Bohemia', 'north Bohemia', 'west Bohemia', 'north Moravia', 'south Moravia'],
@@ -86,9 +86,6 @@ def join_client(disp, client, district):
 
     joined_client = joined_client.join(crime_95, rsuffix="_95")
     joined_client = joined_client.join(crime_96, rsuffix="_96")
-
-    c = joined_client.select_dtypes(np.floating).columns
-    joined_client[c] = imp.fit_transform(joined_client[c])
 
     joined_client = joined_client.astype('float64')
     print(joined_client)
@@ -151,9 +148,8 @@ def join_and_encode_dataset(dataset, trans, disp, account, district, client):
     with pd.option_context('display.max_columns', None):
         print(joined)
 
-    imp = SimpleImputer(missing_values=np.nan, strategy='mean')
-    c = joined.select_dtypes(np.floating).columns
-    joined[c] = imp.fit_transform(joined[c])
+    joined = joined.replace('?', np.nan)
+    joined = joined.fillna(joined.mean())
     return joined
 
 
