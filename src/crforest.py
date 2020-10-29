@@ -7,6 +7,7 @@ from sklearn.metrics import classification_report, confusion_matrix, roc_auc_sco
 
 from preprocessing import down_sampling, forward_selection
 from smote import smote_sampling
+from plot import plot_auc
 
 
 def crforest_loan(train_dataset, test_dataset, eval_dataset, selected_features):
@@ -45,6 +46,8 @@ def crforest_loan(train_dataset, test_dataset, eval_dataset, selected_features):
     print(str(classification_report(y_test, y_pred, zero_division=0)))
     print(f"Current AUC: {current_AUC}")
     print("Accuracy: %.2f%%" % (accuracy * 100.0))
+
+    plot_auc(clf, X_test, y_test, "random_forest")
 
     X_eval = eval_dataset.drop(columns=["status"])
     X_eval = X_eval[selected_features].values

@@ -175,10 +175,7 @@ def prepare_development_dataset(dataset, trans, disp, account, district, client)
         dataset, trans, disp, account, district, client
     )
 
-    selected_features = forward_selection(joined_dataset.drop(
-        columns=["status"]), joined_dataset.iloc[:, -1])
-
-    return joined_dataset, selected_features
+    return joined_dataset
 
 
 def prepare_evaluation_dataset(dataset, trans, disp, account, district, client):
