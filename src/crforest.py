@@ -5,14 +5,11 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, accuracy_score
 
-from preprocessing import down_sampling, forward_selection
 from smote import smote_sampling
 from plot import plot_auc
 
 
 def crforest_loan(train_dataset, test_dataset, eval_dataset, selected_features):
-    #train_dataset = down_sampling(train_dataset)
-
     X_test = test_dataset.drop(columns=["status"])
     y_test = test_dataset.iloc[:, -1]
     X_train = train_dataset.drop(columns=["status"])

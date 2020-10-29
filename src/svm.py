@@ -5,6 +5,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, accuracy_score
 
+from smote import smote_sampling
 from plot import plot_auc
 
 
@@ -21,6 +22,8 @@ def svm_loan(train_dataset, test_dataset, eval_dataset, selected_features):
     y_test = y_test.values
     X_train = X_train.values
     y_train = y_train.values
+
+    X_train, y_train = smote_sampling(X_train, y_train)
 
     scaler = StandardScaler()
     scaler.fit(X_train)

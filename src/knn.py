@@ -7,6 +7,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
 from sklearn import metrics
 
+from smote import smote_sampling
 from plot import plot_auc
 
 
@@ -23,6 +24,8 @@ def knn_loan(train_dataset, test_dataset, eval_dataset, selected_features):
     y_test = y_test.values
     X_train = X_train.values
     y_train = y_train.values
+
+    X_train, y_train = smote_sampling(X_train, y_train)
 
     scaler = StandardScaler()
     scaler.fit(X_train)
@@ -52,6 +55,7 @@ def knn_loan(train_dataset, test_dataset, eval_dataset, selected_features):
     print(str(confusion_matrix(y_test, y_pred)))
     print(str(classification_report(y_test, y_pred, zero_division=0)))
     print(f"AUC: {roc_auc_score(y_test, y_pred)}")
+    print(f"Best K: {best_k}")
 
     plot_auc(knn, X_test, y_test, "knn")
 
