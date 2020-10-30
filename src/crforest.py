@@ -7,6 +7,7 @@ from sklearn.metrics import classification_report, confusion_matrix, roc_auc_sco
 
 from smote import smote_sampling
 from plot import plot_auc
+from parameters_tuning import parameters_tuner
 
 
 def crforest_loan(train_dataset, test_dataset, eval_dataset, selected_features):
@@ -31,8 +32,9 @@ def crforest_loan(train_dataset, test_dataset, eval_dataset, selected_features):
     X_train = scaler.transform(X_train)
     X_test = scaler.transform(X_test)
 
-    clf = RandomForestClassifier(max_depth=2, random_state=0)
-    clf.fit(X_train, y_train)
+    #clf = RandomForestClassifier(max_depth=2, random_state=0)
+    #clf.fit(X_train, y_train)
+    clf = parameters_tuner(X_train, y_train)
 
     y_pred = clf.predict(X_test)
     predictions = [round(value) for value in y_pred]
