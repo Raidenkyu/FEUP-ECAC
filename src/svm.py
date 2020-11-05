@@ -4,6 +4,8 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, accuracy_score
+from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import GridSearchCV
 
 from smote import smote_sampling
 from plot import plot_auc
@@ -31,8 +33,9 @@ def svm_loan(train_dataset, test_dataset, eval_dataset, selected_features):
     X_train = scaler.transform(X_train)
     X_test = scaler.transform(X_test)
 
-    svclassifier = SVC(gamma='auto')
-    svclassifier.fit(X_train, y_train)
+    #svclassifier = SVC(gamma='auto')
+    #svclassifier.fit(X_train, y_train)
+    svclassifier = parameters_tuner(X_train, y_train)
 
     y_pred = svclassifier.predict(X_test)
 
@@ -59,3 +62,36 @@ def svm_loan(train_dataset, test_dataset, eval_dataset, selected_features):
     })
 
     return result
+
+
+def random_tuner(X_train, y_train):
+    param_grid = {'C': [0.1, 1, 10, 100], 'gamma': [
+        1, 0.1, 0.01, 0.001], 'kernel': ['rbf', 'poly', 'sigmoid']}
+
+    svc_random = RandomizedSearchCV(SVC(), param_grid, refit=True, verbose=2)
+
+    # Fit the random search model
+    svc_random.fit(X_train, y_train)
+
+    print(svc_random.best_params_)
+
+    return svc_random
+
+
+def search_tuner(X_train, y_train, param_grid):
+    grid_search = GridSearchCV(SVC(), param_grid, refit=True, verbose=2)
+
+    grid_search.fit(X_train, y_train)
+
+    return grid_search
+
+
+def parameters_tuner(X_train, y_train):
+    # return random_tuner(X_train, y_train)
+
+    param_grid = {
+        'kernel': ['rbf', 'sigmoid'],
+        'gamma': [0.01, 1, 0.1, 0.001],
+        'C': [100, 0.1, 1, 10]
+    }
+    return search_tuner(X_train, y_train, param_grid)
