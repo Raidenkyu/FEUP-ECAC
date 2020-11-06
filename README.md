@@ -9,9 +9,10 @@ Execute this command, in the root of the repository, to install all dependencies
 
 ## How to run
 ```python
-python src <knn|svm|forest|xgboost!gbm>
+python src <knn|svm|forest|xgboost|gbm>
 ```
 Execute this command, in the root of the repository, to run the project
+In some machine the command to run python 3 is `python3` and not just `python`
 
 ## Authors
 * João Álvaro Ferreia
