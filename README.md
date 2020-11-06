@@ -9,9 +9,11 @@ Execute this command, in the root of the repository, to install all dependencies
 
 ## How to run
 ```python
-python3 src <knn|svm|forest>
+python src <knn|svm|forest|xgboost!gbm>
 ```
 Execute this command, in the root of the repository, to run the project
 
 ## Authors
+* João Álvaro Ferreia
+* João Augusto Lima
 * João Carlos Maduro
